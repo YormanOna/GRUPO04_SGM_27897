@@ -1,0 +1,60 @@
+# ============================================================
+# Dockerfile para Backend FastAPI
+# ============================================================
+FROM python:3.11-slim
+
+# Metadata
+LABEL maintainer="Sistema Hospitalario"
+LABEL description="Backend FastAPI para Sistema de Gestión Médica"
+
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    gcc \
+    default-libmysqlclient-dev \
+    default-mysql-client \
+    pkg-config \
+    curl \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar requirements
+COPY requirements.txt .
+
+# Instalar dependencias de Python
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copiar código de la aplicación
+COPY . .
+
+# Crear directorio para logs
+RUN mkdir -p /app/logs
+
+# Exponer puerto
+EXPOSE 8000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/ || exit 1
+
+# Script de inicio integrado
+CMD ["/bin/bash", "-c", "echo '🚀 Iniciando Backend FastAPI...' && \
+     echo '⏳ Esperando 10 segundos adicionales para MySQL...' && \
+     sleep 10 && \
+     echo '🔧 Verificando conexión a base de datos...' && \
+     python -c 'import pymysql; pymysql.connect(host=\"mysql\", user=\"hospital_user\", password=\"hospital_pass\", database=\"GestionMedicaDB\"); print(\"✅ Conexión exitosa a MySQL\")' && \
+     echo '🔧 Creando tablas...' && \
+     python -c 'from app.core.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"✅ Tablas creadas\")' && \
+     echo '📋 Cargando datos iniciales...' && \
+     python -c 'from app.core.init_data import initialize_default_data; initialize_default_data(); print(\"✅ Datos iniciales cargados\")' && \
+     echo '🎯 Iniciando servidor Uvicorn...' && \
+     uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]

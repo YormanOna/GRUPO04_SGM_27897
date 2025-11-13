@@ -1,0 +1,113 @@
+services:
+  # ============================================================
+  # BASE DE DATOS MySQL
+  # ============================================================
+  mysql:
+    image: mysql:8.0
+    container_name: hospital-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: GestionMedicaDB
+      MYSQL_USER: hospital_user
+      MYSQL_PASSWORD: hospital_pass
+    ports:
+      - "3307:3306"  # Puerto 3307 en host para evitar conflictos
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../Aplicacion/DB/InsertDatos.sql:/docker-entrypoint-initdb.d/01-insert-datos.sql:ro
+    networks:
+      - hospital-network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 40s
+
+  # ============================================================
+  # BACKEND FastAPI
+  # ============================================================
+  backend:
+    build:
+      context: ../Aplicacion/Backend
+      dockerfile: ../../Docker Compose/Dockerfile.backend
+    container_name: hospital-backend
+    restart: unless-stopped
+    environment:
+      # Configuración de Base de Datos
+      DATABASE_URL: mysql+pymysql://hospital_user:hospital_pass@mysql:3306/GestionMedicaDB
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: hospital_user
+      DB_PASSWORD: hospital_pass
+      DB_NAME: GestionMedicaDB
+      
+      # Configuración JWT
+      SECRET_KEY: tu-clave-secreta-super-segura-cambiar-en-produccion
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 43200
+      
+      # Configuración del servidor
+      PYTHONUNBUFFERED: 1
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../Aplicacion/Backend:/app
+      - backend_cache:/root/.cache
+    networks:
+      - hospital-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================================
+  # FRONTEND React + Vite
+  # ============================================================
+  frontend:
+    build:
+      context: ../Aplicacion/Frontend
+      dockerfile: ../../Docker Compose/Dockerfile.frontend
+    container_name: hospital-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_WS_URL: ws://localhost:8000/ws
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../Aplicacion/Frontend:/app
+      - /app/node_modules
+      - frontend_cache:/root/.npm
+    networks:
+      - hospital-network
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
+# ============================================================
+# VOLÚMENES PERSISTENTES
+# ============================================================
+volumes:
+  mysql_data:
+    driver: local
+  backend_cache:
+    driver: local
+  frontend_cache:
+    driver: local
+
+# ============================================================
+# RED PRIVADA
+# ============================================================
+networks:
+  hospital-network:
+    driver: bridge

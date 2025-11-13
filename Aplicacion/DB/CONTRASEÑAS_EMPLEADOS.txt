@@ -1,0 +1,147 @@
+================================================================================
+CONTRASEÑAS DE EMPLEADOS - InsertDatos.sql
+================================================================================
+Fecha: 8 de noviembre de 2025
+Base de Datos: GestionMedicaDB
+Hash: bcrypt ($2b$12$...)
+
+IMPORTANTE: Todas las contraseñas están hasheadas usando bcrypt.
+El hash mostrado en la base de datos corresponde a las siguientes contraseñas:
+
+================================================================================
+CONTRASEÑAS POR ROL
+================================================================================
+
+MÉDICOS - Password: medico123
+----------------------------------------
+1.  Carlos Méndez       - carlos.mendez@hospital.com      - Cédula: 1104567890
+2.  María González      - maria.gonzalez@hospital.com     - Cédula: 1104567891
+3.  Juan Rodríguez      - juan.rodriguez@hospital.com     - Cédula: 1104567892
+4.  Ana Pérez           - ana.perez@hospital.com          - Cédula: 1104567893
+5.  Luis Torres         - luis.torres@hospital.com        - Cédula: 1104567894
+6.  Roberto Díaz        - roberto.diaz@hospital.com       - Cédula: 1104567902
+7.  Valeria Ruiz        - valeria.ruiz@hospital.com       - Cédula: 1104567903
+8.  Fernando Ortiz      - fernando.ortiz@hospital.com     - Cédula: 1104567904
+
+FARMACÉUTICOS - Password: farma123
+----------------------------------------
+9.  Carmen Sánchez      - carmen.sanchez@hospital.com     - Cédula: 1104567895
+10. Pedro Ramírez       - pedro.ramirez@hospital.com      - Cédula: 1104567896
+
+ENFERMERAS - Password: enfer123
+----------------------------------------
+11. Sofía Jiménez       - sofia.jimenez@hospital.com      - Cédula: 1104567897
+12. Miguel Castro       - miguel.castro@hospital.com      - Cédula: 1104567898
+
+ADMINISTRADORES - Password: admin123
+----------------------------------------
+13. Laura Morales       - laura.morales@hospital.com      - Cédula: 1104567899
+14. Diego Vargas        - diego.vargas@hospital.com       - Cédula: 1104567900
+
+SUPER ADMINISTRADOR - Password: superadmin123
+----------------------------------------
+15. Patricia Herrera    - patricia.herrera@hospital.com   - Cédula: 1104567901
+
+================================================================================
+RESUMEN DE CONTRASEÑAS
+================================================================================
+
+Rol                 | Contraseña      | Cantidad de Usuarios
+--------------------|-----------------|---------------------
+Médico              | medico123       | 8 usuarios
+Farmacéutico        | farma123        | 2 usuarios
+Enfermera           | enfer123        | 2 usuarios
+Administrador       | admin123        | 2 usuarios
+Super Administrador | superadmin123   | 1 usuario
+--------------------|-----------------|---------------------
+TOTAL                                 | 15 usuarios
+
+================================================================================
+HASH DE CONTRASEÑAS (Almacenado en BD)
+================================================================================
+
+Hashes bcrypt por contraseña:
+
+medico123:
+$2b$12$hb1aqR72wQdly.7D9jb0WONsxVR0NWArvGe27XwixzhAKmTEPiMNK
+
+farma123:
+$2b$12$l0Tghebvd/2ZKvCsZsdCtOw4.NtInm9t9Njnu90oLP.xlxPViOcCG
+
+enfer123:
+$2b$12$G3zveM.9aCCPFFpgemNpC.3PxN7p5mhFfpnydsZFuYyNRjL4Ygi6W
+
+admin123:
+$2b$12$mEykh6delmWCmseup4JQWe7RP95Tr3Vjiq7tt9ufOY977mrwUASkG
+
+superadmin123:
+$2b$12$w0Rhwcw7Nmd90ru9Ur4UO.CQp1TtdGDs5oYa9SMdnCJzT65LlSCfm
+
+================================================================================
+USUARIOS BASE DEL SISTEMA (init_data.py)
+================================================================================
+
+Además de estos 15 usuarios, el sistema crea automáticamente 5 usuarios base:
+
+1. Super Admin      - superadmin@hospital.com    - superadmin123  (Cédula: 1111111111)
+2. Admin            - admin@hospital.com         - admin123       (Cédula: 1234567890)
+3. Médico           - medico@hospital.com        - medico123      (Cédula: 9876543210)
+4. Enfermera        - enfermera@hospital.com     - enfer123       (Cédula: 5555555555)
+5. Farmacéutico     - farmacia@hospital.com      - farma123       (Cédula: 7777777777)
+
+TOTAL DE USUARIOS EN EL SISTEMA: 20 usuarios (5 base + 15 de ejemplo)
+
+================================================================================
+NOTAS IMPORTANTES
+================================================================================
+
+1. SEGURIDAD: Estas contraseñas son solo para propósitos de desarrollo y testing.
+              En producción, DEBES cambiar todas las contraseñas inmediatamente.
+
+2. HASH: Los hashes bcrypt son generados correctamente y cada contraseña tiene
+         su propio hash único. Los usuarios base de init_data.py generan sus
+         hashes dinámicamente al iniciar el sistema por primera vez.
+
+3. LOGIN: Para iniciar sesión en el sistema, usa cualquier email de la lista
+          con su contraseña correspondiente.
+
+4. TESTING: Se recomienda usar estos usuarios para probar diferentes roles y
+            permisos en el sistema.
+
+5. DOCUMENTACIÓN: Para más detalles sobre los usuarios, consulta:
+                  - Backend/USUARIOS_DEFECTO.md
+                  - README.md (sección "Usuarios por Defecto")
+
+================================================================================
+EJEMPLOS DE USO
+================================================================================
+
+Para probar el sistema como MÉDICO:
+- Email: carlos.mendez@hospital.com o medico@hospital.com
+- Password: medico123
+
+Para probar el sistema como ADMINISTRADOR:
+- Email: laura.morales@hospital.com o admin@hospital.com
+- Password: admin123
+
+Para probar el sistema como FARMACÉUTICO:
+- Email: carmen.sanchez@hospital.com o farmacia@hospital.com
+- Password: farma123
+
+Para probar el sistema como ENFERMERA:
+- Email: sofia.jimenez@hospital.com o enfermera@hospital.com
+- Password: enfer123
+
+Para probar el sistema como SUPER ADMIN:
+- Email: patricia.herrera@hospital.com o superadmin@hospital.com
+- Password: superadmin123
+
+================================================================================
+CONTACTO Y SOPORTE
+================================================================================
+
+Para más información o soporte:
+- Repositorio: https://github.com/YormanOna/Grupo04-Proyecto
+- Documentación: Ver README.md en la raíz del proyecto
+
+================================================================================
