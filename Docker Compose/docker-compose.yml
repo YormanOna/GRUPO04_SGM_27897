@@ -7,12 +7,12 @@ services:
     container_name: hospital-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: GestionMedicaDB
-      MYSQL_USER: hospital_user
-      MYSQL_PASSWORD: hospital_pass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-GestionMedicaDB}
+      MYSQL_USER: ${MYSQL_USER:-hospital_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hospital_pass}
     ports:
-      - "3307:3306"  # Puerto 3307 en host para evitar conflictos
+      - "${MYSQL_PORT:-3307}:3306"  # Puerto configurable en host
     volumes:
       - mysql_data:/var/lib/mysql
       - ../Aplicacion/DB/InsertDatos.sql:/docker-entrypoint-initdb.d/01-insert-datos.sql:ro
@@ -37,23 +37,23 @@ services:
     restart: unless-stopped
     environment:
       # Configuración de Base de Datos
-      DATABASE_URL: mysql+pymysql://hospital_user:hospital_pass@mysql:3306/GestionMedicaDB
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: hospital_user
-      DB_PASSWORD: hospital_pass
-      DB_NAME: GestionMedicaDB
+      DATABASE_URL: mysql+pymysql://${DB_USER:-hospital_user}:${DB_PASSWORD:-hospital_pass}@${DB_HOST:-mysql}:${DB_PORT:-3306}/${DB_NAME:-GestionMedicaDB}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-hospital_user}
+      DB_PASSWORD: ${DB_PASSWORD:-hospital_pass}
+      DB_NAME: ${DB_NAME:-GestionMedicaDB}
       
       # Configuración JWT
-      SECRET_KEY: tu-clave-secreta-super-segura-cambiar-en-produccion
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 43200
+      JWT_SECRET: ${JWT_SECRET:-tu-clave-secreta-super-segura-cambiar-en-produccion-hospital-2024}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-43200}
       
       # Configuración del servidor
       PYTHONUNBUFFERED: 1
       ENVIRONMENT: production
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ../Aplicacion/Backend:/app
       - backend_cache:/root/.cache
@@ -79,10 +79,10 @@ services:
     container_name: hospital-frontend
     restart: unless-stopped
     environment:
-      VITE_API_URL: http://localhost:8000
-      VITE_WS_URL: ws://localhost:8000/ws
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8000/ws}
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:5173"
     volumes:
       - ../Aplicacion/Frontend:/app
       - /app/node_modules

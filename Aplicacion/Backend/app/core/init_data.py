@@ -129,7 +129,12 @@ def initialize_default_data():
         inicializar_diagnosticos_cie10(db)
         logger.info("✅ Inicialización de datos completada")
     except Exception as e:
-        logger.error(f"❌ Error al inicializar datos: {str(e)}")
+        # Silenciar errores de importación circular durante el primer intento
+        # (cuando se llama desde el script de inicio antes de que FastAPI cargue todos los modelos)
+        if "failed to locate a name" in str(e) or "is not defined" in str(e):
+            logger.debug(f"ℹ️  Inicialización diferida (se ejecutará en el startup de la app)")
+        else:
+            logger.error(f"❌ Error al inicializar datos: {str(e)}")
         db.rollback()
     finally:
         db.close()
